@@ -24,7 +24,6 @@ clusterFork.start(function(master) {
     cb();
   }
 
-  smartStream.bufferSize = 1;
   smartStream.on('flush', function(users) {
     console.log(users.length + ' objects');
     master.nextWorker.send({
