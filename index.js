@@ -10,6 +10,7 @@ clusterFork.start(function(master) {
   mongoose.connect('mongodb://localhost/streaming')
   schema.expose(models, mongoose)
 
+  var started = new Date();
   var numChunks = 0;
   var collated = {};
   var collate = function(mapped, cb) {
@@ -23,6 +24,7 @@ clusterFork.start(function(master) {
     cb();
   }
 
+  smartStream.bufferSize = 1;
   smartStream.on('flush', function(users) {
     console.log(users.length + ' objects');
     master.nextWorker.send({
@@ -67,7 +69,8 @@ clusterFork.start(function(master) {
       console.log('Received a reduce with ' + Object.keys(msg.data).length + ' keys');
       console.log(msg.data);
       if (numReduced == master.numWorkers) {
-        console.log('Done');
+        var ended = new Date();
+        console.log('Done, took ' + (ended-started)/1000 + ' seconds');
         process.exit();
       }
     }
